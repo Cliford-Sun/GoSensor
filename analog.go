@@ -23,7 +23,7 @@ func (t *SensorData) randData() []byte {
 	t.Timestamp = time.Now().Format("2006-01-02 15:04:05")
 	jStr, err := json.Marshal(t)
 	if err != nil {
-		panic(err)
+		fmt.Println("SensorData Marshal error:", err)
 	}
 	return jStr
 }
@@ -32,25 +32,25 @@ func Start(serverip string, port int) {
 	//建立udp链接
 	conn, err := net.Dial("udp", serverip+":"+strconv.Itoa(port))
 	if err != nil {
-		panic(err)
+		fmt.Println("Dial error:", err)
 	}
 
 	//关闭链接
 	defer func(conn net.Conn) {
 		err := conn.Close()
 		if err != nil {
-			panic(err)
+			fmt.Println("Close error:", err)
 		}
 	}(conn)
 
-	fmt.Println("running......")
+	fmt.Println("start......")
 
 	s := SensorData{}
 	for {
 		//发送传感器数据
 		_, err := conn.Write(s.randData())
 		if err != nil {
-			panic(err)
+			fmt.Println("Write error:", err)
 		}
 
 		//间隔一秒
