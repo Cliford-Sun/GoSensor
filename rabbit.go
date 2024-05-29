@@ -15,14 +15,10 @@ type Mq struct {
 	Conn    *amqp.Connection
 	Channel *amqp.Channel
 
-	//队列名称
-	QueueName string
-	//交换机
-	Exchange string
-	//routing Key
+	QueueName  string
+	Exchange   string
 	RoutingKey string
-	//MQl链接字符串
-	MQurl string
+	MQurl      string
 }
 
 // NewRabbitMQ 创建结构体实例
@@ -34,12 +30,10 @@ func NewRabbitMQ(queueName, exchange, routineKey string) *Mq {
 		MQurl:      MQURL,
 	}
 	var err error
-	//创建rabbitmq链接
 	rabbitMQ.Conn, err = amqp.Dial(rabbitMQ.MQurl)
 	if err != nil {
 		log.Fatalln("RabbitMQ connection error:", err)
 	}
-	//创建Channel
 	rabbitMQ.Channel, err = rabbitMQ.Conn.Channel()
 	if err != nil {
 		log.Fatalln("RabbitMQ channel error:", err)
@@ -49,13 +43,16 @@ func NewRabbitMQ(queueName, exchange, routineKey string) *Mq {
 
 // ReleaseMq 释放资源
 func (mq *Mq) ReleaseMq() {
-	mq.Conn.Close()
-	mq.Channel.Close()
+	if mq.Conn != nil {
+		mq.Conn.Close()
+	}
+	if mq.Channel != nil {
+		mq.Channel.Close()
+	}
 }
 
 // PublishMq 将获取的模拟数据传输到RabbitMQ的服务器中
 func (mq *Mq) PublishMq(sensor *SensorData) {
-	//声明队列
 	_, err := mq.Channel.QueueDeclare(
 		mq.QueueName,
 		true,
@@ -68,7 +65,6 @@ func (mq *Mq) PublishMq(sensor *SensorData) {
 		log.Fatalln("Queue Declare error:", err)
 	}
 
-	//声明交换器
 	err = mq.Channel.ExchangeDeclare(
 		mq.Exchange,
 		"topic",
@@ -82,7 +78,6 @@ func (mq *Mq) PublishMq(sensor *SensorData) {
 		log.Fatalln("Exchange Declare error:", err)
 	}
 
-	//建立关系
 	err = mq.Channel.QueueBind(
 		mq.QueueName,
 		mq.RoutingKey,
@@ -94,13 +89,11 @@ func (mq *Mq) PublishMq(sensor *SensorData) {
 		log.Fatalln("Queue Bind error:", err)
 	}
 
-	//将数据转化成json格式
 	jStr, err := json.Marshal(sensor)
 	if err != nil {
 		fmt.Println("Json Marshal error:", err)
 	}
 
-	//发送json格式消息
 	err = mq.Channel.Publish(
 		mq.Exchange,
 		mq.RoutingKey,
@@ -115,5 +108,38 @@ func (mq *Mq) PublishMq(sensor *SensorData) {
 		fmt.Println("Publish error:", err)
 	} else {
 		fmt.Println(sensor)
+	}
+}
+
+func getRabbitMQConnection() (*amqp.Connection, error) {
+	conn, err := amqp.Dial(MQURL)
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
+}
+
+func consumeRabbitMQ(mq *Mq, ch chan<- SensorData) {
+	msgs, err := mq.Channel.Consume(
+		mq.QueueName,
+		"",
+		true,
+		false,
+		false,
+		false,
+		nil,
+	)
+	if err != nil {
+		log.Fatalf("Failed to register a consumer: %s", err)
+	}
+
+	for msg := range msgs {
+		var sensorData SensorData
+		err := json.Unmarshal(msg.Body, &sensorData)
+		if err != nil {
+			log.Printf("Error decoding JSON: %s", err)
+			continue
+		}
+		ch <- sensorData
 	}
 }

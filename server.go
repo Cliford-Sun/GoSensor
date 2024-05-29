@@ -22,13 +22,11 @@ type Server struct {
 
 // init 初始化数据库并且预编译SQL语句
 func initDB() {
-	// 初始化数据库连接
 	var err error
 	db, err = sql.Open("mysql", "root:123SZCszc@tcp(127.0.0.1:3306)/sensordata")
 	if err != nil {
 		log.Fatalln("open Sqlserver err:", err)
 	}
-	// 预编译SQL语句
 	stmt, err = db.Prepare("INSERT INTO sdata(Temperature, Humidity, time, TemWarning, HumWarning) VALUES(?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Fatalln("prepare Sqlserver err:", err)
@@ -37,8 +35,12 @@ func initDB() {
 
 // closeDB 关闭数据库连接
 func closeDB(db *sql.DB, stmt *sql.Stmt) {
-	db.Close()
-	stmt.Close()
+	if db != nil {
+		db.Close()
+	}
+	if stmt != nil {
+		stmt.Close()
+	}
 }
 
 // newServer 建立新的server链接
@@ -64,13 +66,12 @@ func InsertSensorData(sensor *SensorData) {
 	if err != nil {
 		fmt.Println("Data insert err:", err)
 	}
-	//fmt.Println(sensor.Timestamp, " : temperature = ", sensor.Temperature, ";Humidity = ", sensor.Humidity, "high Temperature?", temWarn, "high Humidity?", humWarn)
 }
 
 // ReceiveJsonData 接收UDP传输的数据并插入数据库
 func ReceiveJsonData(conn *net.UDPConn, mq *Mq) {
 	sensor := &SensorData{}
-	buf := make([]byte, 1024) //缓存区重用
+	buf := make([]byte, 1024)
 	for {
 		n, _, err := conn.ReadFromUDP(buf)
 		if err != nil {
@@ -78,10 +79,9 @@ func ReceiveJsonData(conn *net.UDPConn, mq *Mq) {
 			continue
 		}
 		if n > 0 {
-			// 将数据从json格式转换
-			ero := json.Unmarshal(buf[:n], sensor)
-			if ero != nil {
-				fmt.Println("json Unmarshal err:", ero)
+			err := json.Unmarshal(buf[:n], sensor)
+			if err != nil {
+				fmt.Println("json Unmarshal err:", err)
 				continue
 			}
 			InsertSensorData(sensor)

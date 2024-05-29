@@ -29,12 +29,10 @@ func main() {
 		log.Fatalln("ListenUDP err:", err)
 	}
 
-	//关闭监听
-	defer conn.Close()
-
-	//建立go程接收传感器数据
 	go ReceiveJsonData(conn, mq)
 
-	//阻塞主程序
-	select {}
+	r := setupRouter(mq, db)
+	if err := r.Run(":8080"); err != nil {
+		log.Fatalf("Gin server run failed: %v", err)
+	}
 }
