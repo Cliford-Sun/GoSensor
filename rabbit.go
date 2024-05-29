@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/streadway/amqp"
+	"log"
 )
 
 // MQURL RabbitMQ服务器地址
@@ -36,12 +37,12 @@ func NewRabbitMQ(queueName, exchange, routineKey string) *Mq {
 	//创建rabbitmq链接
 	rabbitMQ.Conn, err = amqp.Dial(rabbitMQ.MQurl)
 	if err != nil {
-		fmt.Println("RabbitMQ connection error:", err)
+		log.Fatalln("RabbitMQ connection error:", err)
 	}
 	//创建Channel
 	rabbitMQ.Channel, err = rabbitMQ.Conn.Channel()
 	if err != nil {
-		fmt.Println("RabbitMQ channel error:", err)
+		log.Fatalln("RabbitMQ channel error:", err)
 	}
 	return &rabbitMQ
 }
@@ -52,7 +53,7 @@ func (mq *Mq) ReleaseMq() {
 	mq.Channel.Close()
 }
 
-// PublishMq 将长安其的模拟数据传输到RabbitMQ的服务器中
+// PublishMq 将获取的模拟数据传输到RabbitMQ的服务器中
 func (mq *Mq) PublishMq(sensor *SensorData) {
 	//声明队列
 	_, err := mq.Channel.QueueDeclare(
@@ -64,7 +65,7 @@ func (mq *Mq) PublishMq(sensor *SensorData) {
 		nil,
 	)
 	if err != nil {
-		fmt.Println("Queue Declare error:", err)
+		log.Fatalln("Queue Declare error:", err)
 	}
 
 	//声明交换器
@@ -78,7 +79,7 @@ func (mq *Mq) PublishMq(sensor *SensorData) {
 		nil,
 	)
 	if err != nil {
-		fmt.Println("Exchange Declare error:", err)
+		log.Fatalln("Exchange Declare error:", err)
 	}
 
 	//建立关系
@@ -90,7 +91,7 @@ func (mq *Mq) PublishMq(sensor *SensorData) {
 		nil,
 	)
 	if err != nil {
-		fmt.Println("Queue Bind error:", err)
+		log.Fatalln("Queue Bind error:", err)
 	}
 
 	//将数据转化成json格式

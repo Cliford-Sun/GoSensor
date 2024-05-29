@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"math/rand"
 	"net"
 	"strconv"
@@ -32,16 +33,11 @@ func Start(serverip string, port int) {
 	//建立udp链接
 	conn, err := net.Dial("udp", serverip+":"+strconv.Itoa(port))
 	if err != nil {
-		fmt.Println("Dial error:", err)
+		log.Fatalln("Dial error:", err)
 	}
 
 	//关闭链接
-	defer func(conn net.Conn) {
-		err := conn.Close()
-		if err != nil {
-			fmt.Println("Close error:", err)
-		}
-	}(conn)
+	defer conn.Close()
 
 	fmt.Println("start......")
 

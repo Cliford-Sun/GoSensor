@@ -4,10 +4,9 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	"net"
-	"strconv"
-
 	_ "github.com/go-sql-driver/mysql"
+	"log"
+	"net"
 )
 
 var (
@@ -22,18 +21,24 @@ type Server struct {
 }
 
 // init 初始化数据库并且预编译SQL语句
-func init() {
-	// 初始化数据库连接池
+func initDB() {
+	// 初始化数据库连接
 	var err error
 	db, err = sql.Open("mysql", "root:123SZCszc@tcp(127.0.0.1:3306)/sensordata")
 	if err != nil {
-		fmt.Println("open Sqlserver err:", err)
+		log.Fatalln("open Sqlserver err:", err)
 	}
 	// 预编译SQL语句
 	stmt, err = db.Prepare("INSERT INTO sdata(Temperature, Humidity, time, TemWarning, HumWarning) VALUES(?, ?, ?, ?, ?)")
 	if err != nil {
-		fmt.Println("prepare Sqlserver err:", err)
+		log.Fatalln("prepare Sqlserver err:", err)
 	}
+}
+
+// closeDB 关闭数据库连接
+func closeDB(db *sql.DB, stmt *sql.Stmt) {
+	db.Close()
+	stmt.Close()
 }
 
 // newServer 建立新的server链接
@@ -59,7 +64,6 @@ func InsertSensorData(sensor *SensorData) {
 	if err != nil {
 		fmt.Println("Data insert err:", err)
 	}
-
 	//fmt.Println(sensor.Timestamp, " : temperature = ", sensor.Temperature, ";Humidity = ", sensor.Humidity, "high Temperature?", temWarn, "high Humidity?", humWarn)
 }
 
@@ -84,34 +88,4 @@ func ReceiveJsonData(conn *net.UDPConn, mq *Mq) {
 			mq.PublishMq(sensor)
 		}
 	}
-}
-
-func main() {
-	mq := NewRabbitMQ("SensorQueue", "SensorExchange", "SensorExchange")
-	defer mq.ReleaseMq()
-
-	server := newServer("127.0.0.1", 9000)
-	// 开启模拟传感器的数据发送
-	go Start(server.serverIP, server.serverPort)
-
-	// 建立udp链接
-	addr, err := net.ResolveUDPAddr("udp", server.serverIP+":"+strconv.Itoa(server.serverPort))
-	if err != nil {
-		fmt.Println("Resolve udp err:", err)
-	}
-
-	//监听udp链接
-	conn, err := net.ListenUDP("udp", addr)
-	if err != nil {
-		fmt.Println("ListenUDP err:", err)
-	}
-
-	//关闭监听
-	defer conn.Close()
-
-	//建立go程接收传感器数据
-	go ReceiveJsonData(conn, mq)
-
-	//阻塞主程序
-	select {}
 }
