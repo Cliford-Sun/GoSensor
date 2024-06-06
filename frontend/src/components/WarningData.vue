@@ -2,7 +2,8 @@
   <div class="warning-data-container">
     <h2>高温或高湿度数据</h2>
     <div class="button-container">
-      <button @click="fetchWarningData" class="fetch-button">获取高温或高湿度数据</button>
+      <button @click="fetchTemWarningData" class="fetch-Tem-button">获取最近十条高温数据</button>
+      <button @click="fetchHumWarningData" class="fetch-Hum-button">获取最近十条高湿度数据</button>
       <button @click="clearWarningData" class="clear-button">清空数据</button>
     </div>
     <ul v-if="warningData.length" class="data-list">
@@ -52,13 +53,24 @@ export default {
     };
   },
   methods: {
-    fetchWarningData() {
-      axios.get('http://localhost:8080/warning-data')
+    fetchTemWarningData() {
+      this.warningData = [];
+      axios.get('http://localhost:8080/Tem-warning-data')
           .then(response => {
             this.warningData = response.data;
           })
           .catch(error => {
-            console.error('Error fetching warning data:', error);
+            console.error('Error fetching temperature warning data:', error);
+          });
+    },
+    fetchHumWarningData() {
+      this.warningData = [];
+      axios.get('http://localhost:8080/Hum-warning-data')
+          .then(response => {
+            this.warningData = response.data;
+          })
+          .catch(error => {
+            console.error('Error fetching Humidity warning data:', error);
           });
     },
     clearWarningData() {
@@ -98,7 +110,7 @@ h2 {
   margin-bottom: 20px;
 }
 
-.fetch-button, .query-button, .clear-button {
+.fetch-Tem-button, .fetch-Hum-button, .query-button, .clear-button {
   background-color: #4CAF50;
   color: white;
   padding: 10px 20px;
@@ -108,7 +120,7 @@ h2 {
   margin-left: 10px;
 }
 
-.fetch-button:hover, .query-button:hover, .clear-button:hover {
+.fetch-Tem-button:hover, .fetch-Hum-button:hover, .query-button:hover, .clear-button:hover {
   background-color: #45a049;
 }
 

@@ -38,9 +38,33 @@ func setupRouter(mq *Mq, db *sql.DB) *gin.Engine {
 		}
 	})
 
-	// 获取数据库中高温或高湿度数据接口
-	r.GET("/warning-data", func(c *gin.Context) {
-		rows, err := db.Query("SELECT Temperature, Humidity, time FROM sdata WHERE TemWarning = true OR HumWarning = true ORDER BY time DESC LIMIT 10")
+	// 获取数据库中高温数据接口
+	r.GET("/Tem-warning-data", func(c *gin.Context) {
+		rows, err := db.Query("SELECT Temperature, Humidity, time FROM sdata WHERE TemWarning = true ORDER BY time DESC LIMIT 10")
+		if err != nil {
+			log.Printf("Query error: %s", err)
+			c.JSON(http.StatusInternalServerError, gin.H{"message": "Database query error"})
+			return
+		}
+		defer rows.Close()
+
+		var warningData []SensorData
+		for rows.Next() {
+			var sensorData SensorData
+			err := rows.Scan(&sensorData.Temperature, &sensorData.Humidity, &sensorData.Timestamp)
+			if err != nil {
+				log.Printf("Row scan error: %s", err)
+				continue
+			}
+			warningData = append(warningData, sensorData)
+		}
+
+		c.JSON(http.StatusOK, warningData)
+	})
+
+// 获取数据库中高湿度数据接口
+	r.GET("/Hum-warning-data", func(c *gin.Context) {
+		rows, err := db.Query("SELECT Temperature, Humidity, time FROM sdata WHERE HumWarning = true ORDER BY time DESC LIMIT 10")
 		if err != nil {
 			log.Printf("Query error: %s", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Database query error"})
