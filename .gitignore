@@ -1,0 +1,35 @@
+# Node modules
+frontend/node_modules/
+
+# Log files
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+
+# Compiled files
+frontend/dist/
+
+# Local environment variables
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# IntelliJ/WebStorm project files
+.idea/
+
+# Go binaries
+backend/*.exe
+backend/*.exe~
+backend/*.dll
+backend/*.so
+backend/*.dylib
+backend/*.test
+backend/*.out
+
+# Vendor directory
+backend/vendor/
+
+# Go specific
+backend/*.log
+backend/*.tmp
