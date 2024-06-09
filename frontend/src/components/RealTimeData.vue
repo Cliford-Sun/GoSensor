@@ -1,5 +1,6 @@
 <template>
-  <div>
+  <div class="real-time-data-container">
+    <h2>实时数据</h2>
     <div ref="temperatureChart" style="width: 100%; height: 400px;"></div>
     <div ref="humidityChart" style="width: 100%; height: 400px; margin-top: 20px;"></div>
     <div style="display: flex; justify-content: space-around; margin-top: 20px;">
@@ -10,10 +11,12 @@
 </template>
 
 <script>
+
 import * as echarts from 'echarts';
 import axios from 'axios';
 
 export default {
+  name: "RealTimeData",
   data() {
     return {
       temperatureChart: null,
@@ -176,7 +179,7 @@ export default {
         text: '温度仪表盘',
         left: 'center',
         textStyle: {
-          color: '#ff7f50',
+          color: '#ff3b10',
           fontSize: 20,
         },
       },
@@ -195,17 +198,17 @@ export default {
           },
           pointer: {
             width: 5,
-            color: '#ff7f50',
+            color: '#ff3b10',
           },
           title: {
             offsetCenter: [0, '-30%'],
-            color: '#ff7f50',
+            color: '#ff3b10',
             fontSize: 16,
           },
           detail: {
             formatter: '{value}°C',
             textStyle: {
-              color: '#ff7f50',
+              color: '#ff3b10',
               fontSize: 20,
             },
           },
@@ -220,7 +223,7 @@ export default {
           text: '湿度仪表盘',
           left: 'center',
           textStyle: {
-            color: '#87cefa',
+            color: '#35a5f1',
             fontSize: 20,
           },
         },
@@ -239,17 +242,17 @@ export default {
             },
             pointer: {
               width: 5,
-              color: '#87cefa',
+              color: '#35a5f1',
             },
             title: {
               offsetCenter: [0, '-30%'],
-              color: '#87cefa',
+              color: '#35a5f1',
               fontSize: 16,
             },
             detail: {
               formatter: '{value}%',
               textStyle: {
-                color: '#87cefa',
+                color: '#35a5f1',
                 fontSize: 20,
               },
             },
@@ -310,14 +313,10 @@ export default {
 </script>
 
 <style>
-.container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  background-color: #b8ecd5;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+.real-time-data-container {
+  padding: 5px;
+  font-family: Arial, sans-serif;
+  background-color: #fff9f1;
 }
 
 .charts {
@@ -331,6 +330,7 @@ export default {
   width: 100%;
   height: 400px;
   margin-bottom: 20px;
+  background-color: #f5f5f5; /* 图表背景颜色 */
 }
 
 .gauges {
@@ -342,10 +342,10 @@ export default {
 .gauge {
   width: 45%;
   height: 300px;
+  background-color: #f5f5f5; /* 仪表背景颜色 */
 }
 
 .chart, .gauge {
-  background-color: #9fd8e2;
   border-radius: 8px;
   padding: 20px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);

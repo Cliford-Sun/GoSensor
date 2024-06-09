@@ -1,6 +1,6 @@
 <template>
   <div class="warning-data-container">
-    <h2>极端数据</h2>
+    <h2>警告数据</h2>
     <div class="button-container">
       <button @click="fetchTemWarningData" class="fetch-Tem-button">获取最近十条极端温度数据</button>
       <button @click="fetchHumWarningData" class="fetch-Hum-button">获取最近十条极端湿度数据</button>
@@ -111,15 +111,22 @@ export default {
 <style>
 .warning-data-container {
   padding: 20px;
-  font-family: Arial, sans-serif;
+  font-family: 'Roboto', Arial, sans-serif;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  margin: 10px;
 }
 
 h2 {
   color: #333;
+  text-align: center;
+  margin-bottom: 20px;
 }
 
 .button-container {
   margin-bottom: 20px;
+  text-align: center;
 }
 
 .fetch-Tem-button, .fetch-Hum-button, .query-button, .clear-button {
@@ -129,11 +136,13 @@ h2 {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-left: 10px;
+  margin: 0 10px;
+  transition: background-color 0.3s ease;
 }
 
 .fetch-Tem-button:hover, .fetch-Hum-button:hover, .query-button:hover, .clear-button:hover {
   background-color: #45a049;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 
 .data-list {
@@ -147,29 +156,72 @@ h2 {
   padding: 15px;
   margin-bottom: 10px;
   border-radius: 5px;
+  transition: all 0.2s ease-in-out;
+}
+
+.data-item:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
 }
 
 .data-item p {
   margin: 5px 0;
 }
 
-.high-temp {
-  color: #fb5151;
+.high-temp, .high-humidity {
+  color: #ff3b10;
   font-weight: bold;
 }
 
-.high-humidity {
-  color: #fb5151;
+.low-temp, .low-humidity {
+  color: #35a5f1;
   font-weight: bold;
 }
 
-.low-temp {
-  color: #7373ff;
+form {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+form label {
+  margin-bottom: 5px;
   font-weight: bold;
 }
 
-.low-humidity {
-  color: #7373ff;
-  font-weight: bold;
+form input[type="date"],
+form input[type="number"] {
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+form input[type="date"]:focus,
+form input[type="number"]:focus {
+  outline: none;
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+form button.query-button {
+  padding: 10px 20px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form button.query-button:hover {
+  background-color: #45a049;
+}
+
+@media (max-width: 768px) {
+  form {
+    flex-direction: column;
+  }
 }
 </style>
