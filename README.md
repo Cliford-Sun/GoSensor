@@ -1,19 +1,17 @@
 # GoSensor
 
 ## 项目简介
-这是一个包含Golang后端和Vue3前端的传感器模拟，学习并构建和组织一个全栈应用。
+这是一个包含Golang后端和Vue3前端的传感器模拟，学习并构建和组织一个全栈作业。
 ## 步骤
 ### 后端
-1. 安装Go语言：https://golang.org/doc/install
-2. 在`backend`目录下运行：
+在`backend`目录下运行：
    ```bash
    go mod tidy
    go build main.go server.go analog.go router.go rabbit.go
    go run main.go
    ```
 ### 前端
-1. 安装Node.js和npm：https://nodejs.org/
-2. 在`frontend`目录下运行：
+在`frontend`目录下运行：
     ```bash
     npm install
     npm run dev
