@@ -1,20 +1,26 @@
 <template>
   <div class="warning-data-container">
-    <h2>高温或高湿度数据</h2>
+    <h2>极端数据</h2>
     <div class="button-container">
-      <button @click="fetchTemWarningData" class="fetch-Tem-button">获取最近十条高温数据</button>
-      <button @click="fetchHumWarningData" class="fetch-Hum-button">获取最近十条高湿度数据</button>
+      <button @click="fetchTemWarningData" class="fetch-Tem-button">获取最近十条极端温度数据</button>
+      <button @click="fetchHumWarningData" class="fetch-Hum-button">获取最近十条极端湿度数据</button>
       <button @click="clearWarningData" class="clear-button">清空数据</button>
     </div>
     <ul v-if="warningData.length" class="data-list">
       <li v-for="(data, index) in warningData" :key="index" class="data-item">
-        <p :class="{ 'high-temp': data.temperature > 30 }">温度: {{ data.temperature }}°C</p>
-        <p :class="{ 'high-humidity': data.humidity > 80 }">湿度: {{ data.humidity }}%</p>
+        <p :class="{
+          'high-temp': data.temperature > 35,
+          'low-temp': data.temperature < 5
+        }">温度: {{ data.temperature }}°C</p>
+        <p :class="{
+          'high-humidity': data.humidity > 80,
+          'low-humidity': data.humidity < 20
+        }">湿度: {{ data.humidity }}%</p>
         <p>时间: {{ data.timestamp }}</p>
       </li>
     </ul>
     <div v-else>
-      <p>没有高温或高湿度数据。</p>
+      <p>没有极端数据。</p>
     </div>
 
     <h2>查询预警数据</h2>
@@ -29,8 +35,14 @@
     </form>
     <ul v-if="queriedData.length" class="data-list">
       <li v-for="(data, index) in queriedData" :key="index" class="data-item">
-        <p :class="{ 'high-temp': data.temperature > 30 }">温度: {{ data.temperature }}°C</p>
-        <p :class="{ 'high-humidity': data.humidity > 80 }">湿度: {{ data.humidity }}%</p>
+        <p :class="{
+          'high-temp': data.temperature > 35,
+          'low-temp': data.temperature < 5
+        }">温度: {{ data.temperature }}°C</p>
+        <p :class="{
+          'high-humidity': data.humidity > 80,
+          'low-humidity': data.humidity < 20
+        }">湿度: {{ data.humidity }}%</p>
         <p>时间: {{ data.timestamp }}</p>
       </li>
     </ul>
@@ -142,12 +154,22 @@ h2 {
 }
 
 .high-temp {
-  color: red;
+  color: #fb5151;
   font-weight: bold;
 }
 
 .high-humidity {
-  color: red;
+  color: #fb5151;
+  font-weight: bold;
+}
+
+.low-temp {
+  color: #7373ff;
+  font-weight: bold;
+}
+
+.low-humidity {
+  color: #7373ff;
   font-weight: bold;
 }
 </style>

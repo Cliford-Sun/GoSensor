@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
-	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"net"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var (
@@ -27,7 +28,7 @@ func initDB() {
 	if err != nil {
 		log.Fatalln("open Sqlserver err:", err)
 	}
-	stmt, err = db.Prepare("INSERT INTO sdata(Temperature, Humidity, time, TemWarning, HumWarning) VALUES(?, ?, ?, ?, ?)")
+	stmt, err = db.Prepare("INSERT INTO sdata(Temperature, Humidity, time, highTemWarning, highHumWarning, lowTemWarning, lowHumWarning) VALUES(?, ?, ?, ?, ?, ?, ?)")
 	if err != nil {
 		log.Fatalln("prepare Sqlserver err:", err)
 	}
@@ -52,17 +53,19 @@ func newServer(serverIP string, serverPort int) *Server {
 	return &server
 }
 
-// Warning 判断是否温度过高或者湿度过高
-func Warning(sensor *SensorData) (temWarning bool, humWarning bool) {
-	temWarning = sensor.Temperature > 35
-	humWarning = sensor.Humidity > 80
+// Warning 判断是否存在极端数据情况
+func Warning(sensor *SensorData) (highTemWarning bool,highHumWarning bool,lowTemWarning bool,lowHumWarning bool) {
+	highTemWarning = sensor.Temperature > 35
+	highHumWarning = sensor.Humidity > 80
+	lowTemWarning = sensor.Temperature < 5
+	lowHumWarning =	sensor.Humidity < 20
 	return
 }
 
 // InsertSensorData 将传感器数据存入本地数据库
 func InsertSensorData(sensor *SensorData) {
-	temWarn, humWarn := Warning(sensor)
-	_, err := stmt.Exec(sensor.Temperature, sensor.Humidity, sensor.Timestamp, temWarn, humWarn)
+	highTemWarn, highHumWarn,lowTemWarning,lowHumWarning:= Warning(sensor)
+	_, err := stmt.Exec(sensor.Temperature, sensor.Humidity, sensor.Timestamp, highTemWarn, highHumWarn, lowTemWarning, lowHumWarning)
 	if err != nil {
 		fmt.Println("Data insert err:", err)
 	}

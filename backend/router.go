@@ -38,9 +38,9 @@ func setupRouter(mq *Mq, db *sql.DB) *gin.Engine {
 		}
 	})
 
-	// 获取数据库中高温数据接口
+	// 获取数据库中极端温度数据接口
 	r.GET("/Tem-warning-data", func(c *gin.Context) {
-		rows, err := db.Query("SELECT Temperature, Humidity, time FROM sdata WHERE TemWarning = true ORDER BY time DESC LIMIT 10")
+		rows, err := db.Query("SELECT Temperature, Humidity, time FROM sdata WHERE (highTemWarning = true OR lowTemWarning = true) ORDER BY time DESC LIMIT 10")
 		if err != nil {
 			log.Printf("Query error: %s", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Database query error"})
@@ -62,9 +62,9 @@ func setupRouter(mq *Mq, db *sql.DB) *gin.Engine {
 		c.JSON(http.StatusOK, warningData)
 	})
 
-// 获取数据库中高湿度数据接口
+// 获取数据库中极端湿度数据接口
 	r.GET("/Hum-warning-data", func(c *gin.Context) {
-		rows, err := db.Query("SELECT Temperature, Humidity, time FROM sdata WHERE HumWarning = true ORDER BY time DESC LIMIT 10")
+		rows, err := db.Query("SELECT Temperature, Humidity, time FROM sdata WHERE (highHumWarning = true OR lowHumWarning = true) ORDER BY time DESC LIMIT 10")
 		if err != nil {
 			log.Printf("Query error: %s", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Database query error"})
@@ -100,7 +100,7 @@ func setupRouter(mq *Mq, db *sql.DB) *gin.Engine {
 		}
 		endTime := startTime.Add(time.Hour)
 
-		rows, err := db.Query("SELECT Temperature, Humidity, time FROM sdata WHERE (TemWarning = true OR HumWarning = true) AND time BETWEEN ? AND ? ORDER BY time ", startTime, endTime)
+		rows, err := db.Query("SELECT Temperature, Humidity, time FROM sdata WHERE (highTemWarning = true OR highHumWarning = true OR lowTemWarning =true OR lowHumWarning =true) AND time BETWEEN ? AND ? ORDER BY time ", startTime, endTime)
 		if err != nil {
 			log.Printf("Query error: %s", err)
 			c.JSON(http.StatusInternalServerError, gin.H{"message": "Database query error"})
