@@ -12,10 +12,10 @@
    ```
 ### 前端
 在`frontend`目录下运行：
-    ```bash
-    npm install
-    npm run dev
-    ```
+   ```bash
+   npm install
+   npm run dev
+   ```
 ## 使用说明
 前后端都运行后访问` http://localhost:5174/ `就可以看前端应用，包含了传感器数据的实时折线图和仪表盘，获取预警数据，查询某时间内的预警数据
 
